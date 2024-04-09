@@ -16,4 +16,4 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: SSH command
-        run: ssh ${{env.SSH_USER}}@${{env.SSH_HOST}} "sudo docker run -p 9000:9000 -p 9001:9001 quay.io/minio/minio server /data --console-address ':9001'"
+        run: ssh ${{github.environment.SSH_USER}}@${{github.environment.SSH_HOST}} "sudo docker run -p 9000:9000 -p 9001:9001 quay.io/minio/minio server /data --console-address ':9001'"
