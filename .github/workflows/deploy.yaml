@@ -1,0 +1,19 @@
+name: Deploy s3 to host
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-to-host:
+    name: Deploy s3 to host
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: SSH command
+        run: ssh {{env.SSH_USER}}@{{env.SSH_HOST}} "sudo docker run -p 9000:9000 -p 9001:9001 quay.io/minio/minio server /data --console-address ':9001'"
