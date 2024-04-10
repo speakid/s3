@@ -18,5 +18,5 @@ jobs:
       - name: SSH command
         run: |
           mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config &&
-          docker stop minio_service && docker rm minio_service 2> /dev/null ; 
-          docker run --rm --name minio_service -v /home/syryx/minio_storage:/data -d -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"
+          ssh syryx@51.250.64.209 'docker stop minio_service && docker rm minio_service 2> /dev/null ; 
+          docker run --rm --name minio_service -v /home/syryx/minio_storage:/data -d -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"'
