@@ -15,9 +15,21 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: SSH command
+      - name: Setup s3
         run: |
           mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config &&
-          echo "${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}" &&
-          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} 'docker stop minio_service && docker rm minio_service 2> /dev/null ; 
-          docker run --rm --name minio_service -v /home/syryx/minio_storage:/data -d -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"'
+          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} '\
+          docker stop minio_service && docker rm minio_service 2> /dev/null ; \
+          docker run --rm --name minio_service \
+          -v /data/minio_storage:/data -d \
+          -p 9000:9000 -p 9001:9001 \
+          minio/minio server /data --console-address ":9001"'
+      - name: Setup databse
+        run: |
+          mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config &&
+          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} '\
+          docker stop postgres_service && docker rm postgres_service 2> /dev/null ; \
+          sudo docker run -d --rm -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} --name postgres_service \
+          -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+          -p 5432:5432 -v /data/postgres_storage:/var/lib/postgresql/data \
+          postgres'
